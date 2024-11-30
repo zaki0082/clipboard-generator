@@ -1,3 +1,6 @@
-# images folder
+# folder
 /images/*
+/clipboards/*
 
+# not ignored
+!/clipboards/sample.html

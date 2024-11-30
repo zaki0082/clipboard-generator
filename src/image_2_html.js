@@ -1,11 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 
-
 const settings = require('../generator_settings.json')      // generator_settings.jsonの内容を取得
 const extensions = settings.image.extensions                // 画像の拡張子リスト
-const imageFolder = settings.image.folder                   // 画像を参照するフォルダ
-const htmlName = settings.html.fileName                     // htmlのファイル名
+const imageFolder = "./images";                             // 画像を参照するフォルダ
+const title = settings.html.title                           // htmlタイトル・ファイル名
+const column = settings.html.layout.column                            // 列数
+const isBarBottom = settings.html.layout.isBarBottom                  // タブバー下表示
+const isDarkMode = settings.html.layout.isDarkMode                      // ダークモード有効化
+
 
 if (require.main === module) {
     main()
@@ -15,13 +18,12 @@ if (require.main === module) {
 function main() {
     try {
         // 画像ファイルを取得
-        const dir = settings.image.folder
-        const imgFolderMap = getImgFiles(dir);
+        const imgFolderMap = getImgFiles(imageFolder);
         console.log(imgFolderMap)
 
         // HTMLファイルを生成
         const htmlContent = htmlTemplate(imgFolderMap);
-        fs.writeFileSync('./clipboards/' + htmlName, htmlContent);
+        fs.writeFileSync(`./clipboards/${title}.html`, htmlContent);
 
         console.log('HTML file has been generated!');
     } catch (e) {
@@ -58,31 +60,36 @@ function getImgFiles(dir, fileList = {}) {
 
 // HTMLテンプレート
 function htmlTemplate(imagesByFolder) {
-return `
+    return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STAND</title>
+    <title>${title}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             padding: 10px;
+            background-color: ${isDarkMode ? '#1E1E1E;' : '#ffffff;'}
         }
+
         .tab {
             display: none;
         }
+
         .tab.active {
             display: block;
         }
+
         .tabs {
-            padding: 20px 0;
+            padding: 15px 0;
             width: 100%;
-            background-color: #fff;
+            background-color: ${isDarkMode ? '#1E1E1E;' : '#ffffff;'}
             position: fixed;
-            top: 0;
+            ${isBarBottom ? 'bottom: 0;' : 'top: 0;'}
         }
+
         .tab-button {
             cursor: pointer;
             background: #007BFF;
@@ -93,6 +100,7 @@ return `
             border-radius: 4px;
             border: none;
         }
+
         .tab-button-2 {
             cursor: pointer;
             background: #fa5021;
@@ -103,41 +111,50 @@ return `
             border-radius: 4px;
             border: none;
         }
+
         .spacer {
             margin-left: 20px;
         }
+
         .tab-button.active {
             background: #0056b3;
         }
+
         .image-container {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             justify-content: flex-start;
-            margin-top: 80px;
+            ${isBarBottom ? 'margin-bottom: 70px;' : 'margin-top: 70px;'}
         }
+
         .image-container img {
             width: 98%;
             height: auto;
             cursor: pointer;
-            border: 2px solid #ddd;
+            border: 3px solid ${isDarkMode ? '#000000;' : '#ddd;'}
             border-radius: 4px;
             padding: 3px;
             transition: 0.3s;
         }
-        .image-container img:hover {
-            border-color: #666;
-        }
-        .image-container div {
-            /* 4つごとに改行 */
-            flex: 1 0 24%; 
-            max-width: 24%;
-            /* 5つごとに改行 */
-            /* flex: 1 0 19%; 
-            max-width: 19%; */
 
+        .image-container img:hover {
+            border-color: ${isDarkMode ? '#dbdbdb;' : '#4e4e4e;'}
+            ${isDarkMode ? 'background-color: #dbdbdb;' : 'opacity: 0.7;'}
+        }
+
+        .image-container div {
+            flex: 1 0 ${100 / column - 1}%;
+            max-width: ${100 / column - 1}%;
+
+            font-size: 1vw;
             box-sizing: border-box;
             text-align: center;
+        }
+
+        .image-container p {
+            color: ${isDarkMode ? '#dbdbdb;' : '#000000;'}
+            font-size: 1.5em;
         }
     </style>
 </head>

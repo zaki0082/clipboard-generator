@@ -1,13 +1,13 @@
 {
     "image" : {
-        "folder" : "./images",
-        "extensions" : [".png", ".jpeg"]
+        "extensions" : [".png", ".jpeg", ".jpg", ".gif", ".bmp"]
     },
     "html" : {
-        "fileName" : "chara_stand.html",
+        "title" : "sample",
         "layout" : {
-            "columns" : 4,
-            "isBarBottom" : false
+            "column" : 4,
+            "isBarBottom" : false,
+            "isDarkMode" : true
         }
     }
-}
+} 
