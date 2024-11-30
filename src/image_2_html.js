@@ -1,12 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 
-// generator_settings.jsonの内容を取得
-const settings = require('../generator_settings.json')
-// 画像の拡張子
-const extensions = settings.image.extensions
-// 画像を参照するフォルダ
-const imageFolder = settings.image.folder
+
+const settings = require('../generator_settings.json')      // generator_settings.jsonの内容を取得
+const extensions = settings.image.extensions                // 画像の拡張子リスト
+const imageFolder = settings.image.folder                   // 画像を参照するフォルダ
+const htmlName = settings.html.fileName                     // htmlのファイル名
 
 if (require.main === module) {
     main()
@@ -17,17 +16,16 @@ function main() {
     try {
         // 画像ファイルを取得
         const dir = settings.image.folder
-        const images = getImgFiles(dir);
-        console.log(images)
+        const imgFolderMap = getImgFiles(dir);
+        console.log(imgFolderMap)
 
-
-        // // HTMLファイルを生成
-        // const htmlContent = htmlTemplate(imagesByFolder);
-        // fs.writeFileSync('stand.html', htmlContent);
+        // HTMLファイルを生成
+        const htmlContent = htmlTemplate(imgFolderMap);
+        fs.writeFileSync('./clipboards/' + htmlName, htmlContent);
 
         console.log('HTML file has been generated!');
     } catch (e) {
-        console.error('エラーが発生しました:', e.message);
+        console.error('エラーが発生しました: ', e);
     }
     
 }
@@ -60,7 +58,6 @@ function getImgFiles(dir, fileList = {}) {
 
 // HTMLテンプレート
 function htmlTemplate(imagesByFolder) {
-
 return `
 <!DOCTYPE html>
 <html lang="en">
@@ -150,15 +147,12 @@ return `
             <button class="tab-button ${index === 0 ? 'active' : ''}" onclick="showTab(${index})">${folder}</button>
         `).join('')}
     </div>
-    <button class="tab-button-2 spacer" onclick="copyToClipboard('DS( -1 );\nZSS( CENTER, , MOVE_STOP, NORMAL );\n')">1人</button>
-    <button class="tab-button-2" onclick="copyToClipboard('DS( -1 );\nZSS( LEFT, , MOVE_STOP, NORMAL );\nZSS( RIGHT, , MOVE_STOP, NORMAL );\n')">2人</button>
-    <button class="tab-button-2" onclick="copyToClipboard('DS( -1 );\nZSS( LEFTLEFT, , MOVE_STOP, NORMAL );\nZSS( CENTER, , MOVE_STOP, NORMAL );\nZSS( RIGHTRIGHT, , MOVE_STOP, NORMAL );\n')">3人</button>
     ${Object.keys(imagesByFolder).map((folder, index) => `
         <div id="tab${index}" class="tab ${index === 0 ? 'active' : ''}">
             <div class="image-container">
                 ${imagesByFolder[folder].map(image => `
                     <div>
-                        <img src="${image.path}" alt="${image.name}" onclick="copyToClipboard('${image.name}')">
+                        <img src="../${image.path}" alt="${image.name}" onclick="copyToClipboard('${image.name}')">
                         <p>${image.name}</p>
                     </div>
                 `).join('')}

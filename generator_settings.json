@@ -3,8 +3,11 @@
         "folder" : "./images",
         "extensions" : [".png", ".jpeg"]
     },
-    "layout" : {
-        "columns" : 4,
-        "isBarBottom" : false
+    "html" : {
+        "fileName" : "chara_stand.html",
+        "layout" : {
+            "columns" : 4,
+            "isBarBottom" : false
+        }
     }
 }
