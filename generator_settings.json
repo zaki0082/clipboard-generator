@@ -1,7 +1,7 @@
 {
     "image" : {
         "folder" : "./images",
-        "findFormat" : ["png", "jpeg"]
+        "extensions" : [".png", ".jpeg"]
     },
     "layout" : {
         "columns" : 4,

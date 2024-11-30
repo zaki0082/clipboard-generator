@@ -1,32 +1,67 @@
 const fs = require('fs');
 const path = require('path');
 
-// 画像フォルダのパス
-const imageFolder = '../copy_image';
+// generator_settings.jsonの内容を取得
+const settings = require('../generator_settings.json')
+// 画像の拡張子
+const extensions = settings.image.extensions
+// 画像を参照するフォルダ
+const imageFolder = settings.image.folder
+
+if (require.main === module) {
+    main()
+}
+
+// main処理
+function main() {
+    try {
+        // 画像ファイルを取得
+        const dir = settings.image.folder
+        const images = getImgFiles(dir);
+        console.log(images)
+
+
+        // // HTMLファイルを生成
+        // const htmlContent = htmlTemplate(imagesByFolder);
+        // fs.writeFileSync('stand.html', htmlContent);
+
+        console.log('HTML file has been generated!');
+    } catch (e) {
+        console.error('エラーが発生しました:', e.message);
+    }
+    
+}
+
 
 // ディレクトリ内を再帰的に探索してPNGファイルを取得する関数
-const getAllPngFiles = (dir, fileList = {}) => {
+function getImgFiles(dir, fileList = {}) {
     const files = fs.readdirSync(dir);
+
     files.forEach(file => {
         const filePath = path.join(dir, file);
+        const extension = path.extname(file).toLowerCase(); 
+        
         if (fs.statSync(filePath).isDirectory()) {
-            fileList = getAllPngFiles(filePath, fileList);
-        } else if (file.toLowerCase().endsWith('.png') && path.basename(file).startsWith('BF')) {
+            fileList = getImgFiles(filePath, fileList);
+        } else if (extensions.includes(extension)) {
             const dirName = path.relative(imageFolder, dir) || 'root';
             if (!fileList[dirName]) {
                 fileList[dirName] = [];
             }
             fileList[dirName].push({
-                name: path.basename(file, '.png').replace(/^BF_/, ''),
+                name: path.basename(file, extension),
                 path: filePath
             });
         }
     });
+
     return fileList;
-};
+}
 
 // HTMLテンプレート
-const htmlTemplate = (imagesByFolder) => `
+function htmlTemplate(imagesByFolder) {
+
+return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -150,14 +185,5 @@ const htmlTemplate = (imagesByFolder) => `
     </script>
 </body>
 </html>
-`;
-
-// 画像ファイルを取得
-const imagesByFolder = getAllPngFiles(imageFolder);
-
-// HTMLファイルを生成
-const htmlContent = htmlTemplate(imagesByFolder);
-fs.writeFileSync('stand.html', htmlContent);
-
-console.log('HTML file has been generated!');
-
+`
+}
