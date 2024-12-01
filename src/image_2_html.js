@@ -5,9 +5,9 @@ const settings = require('../generator_settings.json')      // generator_setting
 const extensions = settings.image.extensions                // 画像の拡張子リスト
 const imageFolder = "./images";                             // 画像を参照するフォルダ
 const title = settings.html.title                           // htmlタイトル・ファイル名
-const column = settings.html.layout.column                            // 列数
-const isBarBottom = settings.html.layout.isBarBottom                  // タブバー下表示
-const isDarkMode = settings.html.layout.isDarkMode                      // ダークモード有効化
+const column = settings.html.layout.column                  // 列数
+const isBarBottom = settings.html.layout.isBarBottom        // タブバー下表示
+const isDarkMode = settings.html.layout.isDarkMode          // ダークモード有効化
 
 
 if (require.main === module) {
@@ -19,13 +19,12 @@ function main() {
     try {
         // 画像ファイルを取得
         const imgFolderMap = getImgFiles(imageFolder);
-        console.log(imgFolderMap)
 
         // HTMLファイルを生成
         const htmlContent = htmlTemplate(imgFolderMap);
         fs.writeFileSync(`./clipboards/${title}.html`, htmlContent);
 
-        console.log('HTML file has been generated!');
+        console.log('HTMLファイルを生成しました！');
     } catch (e) {
         console.error('エラーが発生しました: ', e);
     }
@@ -33,7 +32,7 @@ function main() {
 }
 
 
-// ディレクトリ内を再帰的に探索してPNGファイルを取得する関数
+// ディレクトリ内を再帰的に探索して画像ファイルを取得する関数
 function getImgFiles(dir, fileList = {}) {
     const files = fs.readdirSync(dir);
 
@@ -68,9 +67,12 @@ function htmlTemplate(imagesByFolder) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title}</title>
     <style>
+        html {
+            font-size: 1vw;
+        }
+
         body {
             font-family: Arial, sans-serif;
-            padding: 10px;
             background-color: ${isDarkMode ? '#1E1E1E;' : '#ffffff;'}
         }
 
@@ -82,32 +84,36 @@ function htmlTemplate(imagesByFolder) {
             display: block;
         }
 
-        .tabs {
-            padding: 15px 0;
+        .side-scroll {
             width: 100%;
             background-color: ${isDarkMode ? '#1E1E1E;' : '#ffffff;'}
             position: fixed;
             ${isBarBottom ? 'bottom: 0;' : 'top: 0;'}
+            left: 0;
+            z-index: 999;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-start;
+            overflow-x: scroll;
+            white-space: nowrap;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            padding: 20px 10px;
+        }
+
+        .tabs::-webkit-scrollbar{
+            display: none;
         }
 
         .tab-button {
             cursor: pointer;
             background: #007BFF;
             color: white;
-            font-size: 20px;
+            font-size: min(1.8rem, 20px);
             padding: 10px;
-            margin-right: 10px;
-            border-radius: 4px;
-            border: none;
-        }
-
-        .tab-button-2 {
-            cursor: pointer;
-            background: #fa5021;
-            color: white;
-            font-size: 20px;
-            padding: 10px;
-            margin-right: 10px;
             border-radius: 4px;
             border: none;
         }
@@ -125,7 +131,7 @@ function htmlTemplate(imagesByFolder) {
             flex-wrap: wrap;
             gap: 10px;
             justify-content: flex-start;
-            ${isBarBottom ? 'margin-bottom: 70px;' : 'margin-top: 70px;'}
+            ${isBarBottom ? 'margin-bottom: 90px;' : 'margin-top: 90px;'}
         }
 
         .image-container img {
@@ -147,22 +153,23 @@ function htmlTemplate(imagesByFolder) {
             flex: 1 0 ${100 / column - 1}%;
             max-width: ${100 / column - 1}%;
 
-            font-size: 1vw;
             box-sizing: border-box;
             text-align: center;
         }
 
         .image-container p {
             color: ${isDarkMode ? '#dbdbdb;' : '#000000;'}
-            font-size: 1.5em;
+            font-size: 1.6rem;
         }
     </style>
 </head>
 <body>
-    <div class="tabs">
-        ${Object.keys(imagesByFolder).map((folder, index) => `
-            <button class="tab-button ${index === 0 ? 'active' : ''}" onclick="showTab(${index})">${folder}</button>
-        `).join('')}
+    <div class="side-scroll">
+        <div class="tabs">
+            ${Object.keys(imagesByFolder).map((folder, index) => `
+                <button class="tab-button ${index === 0 ? 'active' : ''}" onclick="showTab(${index})">${folder}</button>
+            `).join('')}
+        </div>
     </div>
     ${Object.keys(imagesByFolder).map((folder, index) => `
         <div id="tab${index}" class="tab ${index === 0 ? 'active' : ''}">
@@ -193,6 +200,20 @@ function htmlTemplate(imagesByFolder) {
             tabs[tabIndex].classList.add('active');
             buttons[tabIndex].classList.add('active');
         }
+
+        const scrollContainer = document.querySelector('.tabs');
+
+        scrollContainer.addEventListener('wheel', (event) => {
+            event.preventDefault();
+            
+            // スクロール速度の倍率を設定（数値を大きくすると速くなる）
+            const speedMultiplier = 5; // この数値を調整
+            
+            scrollContainer.scrollBy({
+                left: event.deltaY * speedMultiplier,
+                behavior: 'smooth'
+            });
+        });
     </script>
 </body>
 </html>

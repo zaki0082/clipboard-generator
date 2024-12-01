@@ -7,7 +7,7 @@
         "layout" : {
             "column" : 4,
             "isBarBottom" : false,
-            "isDarkMode" : true
+            "isDarkMode" : false
         }
     }
 } 
