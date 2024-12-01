@@ -32,7 +32,7 @@ function main() {
 }
 
 
-// ディレクトリ内を再帰的に探索して画像ファイルを取得する関数
+// ディレクトリ内を再帰的に探索して画像ファイルを取得する
 function getImgFiles(dir, fileList = {}) {
     const files = fs.readdirSync(dir);
 
