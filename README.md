@@ -66,7 +66,7 @@ root/
 
 ### 設定項目
 
-generator_settings.jsonをテキストエディタで開き、任意の値を設定してください
+generator_settings.jsonをテキストエディタで開き内容を変更します
 
 - image.extensions
     - クリップボード化する画像ファイルの拡張子を配列形式で指定します
