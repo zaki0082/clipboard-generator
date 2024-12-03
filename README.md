@@ -100,7 +100,7 @@ generator_settings.jsonをテキストエディタで開き内容を変更しま
             "isDarkMode" : true
         }
     }
-} 
+}
 ```
 
 ## 動作環境について
